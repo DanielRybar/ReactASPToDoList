@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ReactASPToDoList.Data;
@@ -78,12 +79,58 @@ namespace ReactASPToDoList.Controllers
         // POST: api/Users
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<User>> PostUser(User user)
+        public async Task<ActionResult<User>> PostUser([FromBody] UserIM user)
         {
-            _context.Users.Add(user);
+            if (_context.Users == null)
+            {
+                return Problem("Entity set 'AppDbContext.User'  is null.");
+            }
+            
+            User newUser = new User { UserName = user.UserName, Password = user.Password };
+            _context.Users.Add(newUser);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetUser", new { id = user.UserId }, user);
+            return CreatedAtAction("GetUser", new { id = newUser.UserId }, user);
+        }
+
+        [HttpPatch("{id}")]
+        public async Task<ActionResult<User>> PatchUser(int id, [FromBody] JsonPatchDocument<User> patch)
+        {
+            if (patch == null)
+            {
+                return BadRequest();
+            }
+            if (_context.Users == null)
+            {
+                return Problem("Entity set 'AppDbContext.User'  is null.");
+            }
+            
+            User user = _context.Users.SingleOrDefault(b => b.UserId == id);
+            if (user != null)
+            {
+                patch.ApplyTo(user, ModelState);
+
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                foreach (var op in patch.Operations)
+                {
+                    if (op.path.ToLower() == "/userid")
+                    {
+                        return BadRequest();
+                    }
+                }
+
+                _context.Entry(user).State = EntityState.Modified;
+                await _context.SaveChangesAsync();
+                return Ok(user);
+            }
+            else
+            {
+                return NotFound();
+            }
         }
 
         // DELETE: api/Users/5
@@ -106,5 +153,11 @@ namespace ReactASPToDoList.Controllers
         {
             return _context.Users.Any(e => e.UserId == id);
         }
+    }
+
+    public class UserIM
+    {
+        public string UserName { get; set; } = String.Empty;
+        public string Password { get; set; } = String.Empty;
     }
 }

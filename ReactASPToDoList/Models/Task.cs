@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Newtonsoft.Json;
+using System.ComponentModel.DataAnnotations;
 
 namespace ReactASPToDoList.Models
 {
@@ -8,6 +9,7 @@ namespace ReactASPToDoList.Models
         [Required]
         public string Name { get; set; } = String.Empty;
         public string Description { get; set; } = String.Empty;
+        [JsonIgnore]
         public User User { get; set; }
         public int UserId { get; set; }
         public DateTime Time { get; set; }

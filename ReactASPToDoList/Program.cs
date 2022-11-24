@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using ReactASPToDoList.Data;
+using ReactASPToDoList.Helpers;
 using ReactASPToDoList.Services;
 using Serilog;
 
@@ -71,7 +72,10 @@ builder.Services.AddAuthorization(opt =>
         .RequireAuthenticatedUser().Build());
 });
 
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews(opt =>
+{
+    opt.InputFormatters.Insert(0, MyJPIF.GetJsonPatchInputFormatter());
+});
 
 var app = builder.Build();
 
@@ -87,12 +91,12 @@ else
     app.UseSwaggerUI();
 }
 
-app.UseAuthentication();
-app.UseAuthorization();
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
