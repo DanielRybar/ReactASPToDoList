@@ -7,6 +7,7 @@ using ReactASPToDoList.Data;
 using ReactASPToDoList.Helpers;
 using ReactASPToDoList.Services;
 using Serilog;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,6 +32,7 @@ builder.Services.AddScoped<AuthenticationService>();
 builder.Services.AddSwaggerGen(options => {
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
     {
+        Name = "Authorization",
         In = ParameterLocation.Header,
         Type = SecuritySchemeType.ApiKey,
         Scheme = "Bearer",
@@ -55,13 +57,18 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
         options.SaveToken = true;
+        var key = Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"]);
 
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
             ValidIssuer = builder.Configuration["JWT:Issuer"],
-            ValidateAudience = false,
-            ValidateLifetime = false
+            ValidateAudience = true,
+            ValidAudience = builder.Configuration["JWT:Audience"],
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.Zero,
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(key)
         };
     });
 
