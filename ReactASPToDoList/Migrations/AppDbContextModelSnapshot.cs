@@ -17,10 +17,10 @@ namespace ReactASPToDoList.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.0")
+                .HasAnnotation("ProductVersion", "6.0.10")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
-            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
             modelBuilder.Entity("ReactASPToDoList.Models.Task", b =>
                 {
@@ -28,7 +28,7 @@ namespace ReactASPToDoList.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TaskId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TaskId"), 1L, 1);
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -52,6 +52,35 @@ namespace ReactASPToDoList.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Tasks");
+
+                    b.HasData(
+                        new
+                        {
+                            TaskId = 1,
+                            Description = "dokončit binární strom",
+                            Finished = false,
+                            Name = "úkol z PRG",
+                            Time = new DateTime(2022, 12, 8, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            UserId = 1
+                        },
+                        new
+                        {
+                            TaskId = 2,
+                            Description = "zpracovat referát o Karlu Čapkovi",
+                            Finished = true,
+                            Name = "úkol z ČJL",
+                            Time = new DateTime(2022, 11, 29, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            UserId = 2
+                        },
+                        new
+                        {
+                            TaskId = 3,
+                            Description = "až přijdu domů, tak okamžitě umyji nádobí",
+                            Finished = false,
+                            Name = "umýt špinavé nádobí",
+                            Time = new DateTime(2022, 12, 24, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            UserId = 2
+                        });
                 });
 
             modelBuilder.Entity("ReactASPToDoList.Models.User", b =>
@@ -60,7 +89,7 @@ namespace ReactASPToDoList.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserId"), 1L, 1);
 
                     b.Property<string>("Password")
                         .IsRequired()
@@ -68,11 +97,28 @@ namespace ReactASPToDoList.Migrations
 
                     b.Property<string>("UserName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("UserId");
 
+                    b.HasIndex("UserName")
+                        .IsUnique();
+
                     b.ToTable("Users");
+
+                    b.HasData(
+                        new
+                        {
+                            UserId = 1,
+                            Password = "180407B4F4EAAD5CD17FCDC15E55A6A1",
+                            UserName = "bobik"
+                        },
+                        new
+                        {
+                            UserId = 2,
+                            Password = "8CB273BEA4AEFCF205DDEA6D241BE474",
+                            UserName = "jirka"
+                        });
                 });
 
             modelBuilder.Entity("ReactASPToDoList.Models.Task", b =>
