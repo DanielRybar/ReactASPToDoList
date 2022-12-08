@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ReactASPToDoList.Data;
 using ReactASPToDoList.Helpers;
@@ -23,7 +24,8 @@ namespace ReactASPToDoList.Controllers
             _logger = logger;
             _context = context;
         }
-
+        
+        [AllowAnonymous]
         [HttpPost("authenticate")]
         public IActionResult Authenticate(string username, [DataType(DataType.Password)] string password)
         {
@@ -50,7 +52,8 @@ namespace ReactASPToDoList.Controllers
                 return BadRequest();
             }
         }
-
+        
+        [AllowAnonymous]
         [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterIM entry)
         {

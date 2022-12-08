@@ -1,4 +1,4 @@
-import React, { createContext, useReducer, useContext, useEffect } from "react";
+import React, { createContext, useReducer, useContext } from "react";
 
 export const SET_ACCESS_TOKEN = "SET_ACCESS_TOKEN";
 export const CLEAR_ACCESS_TOKEN = "CLEAR_ACCESS_TOKEN";
@@ -22,6 +22,7 @@ const reducer = (state, action) => {
             return { ...state, accessToken: action.payload, userId: tokenData.sub, profile: tokenData }
         case CLEAR_ACCESS_TOKEN:
             return { ...state, accessToken: null, userId: null, profile: null }
+        default: break;
     }
 }
 
