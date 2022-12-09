@@ -53,9 +53,37 @@ builder.Services.AddSwaggerGen(options => {
         }
     });
 });
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+builder.Services.AddAuthentication(/*JwtBearerDefaults.AuthenticationScheme */ options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+})
     .AddJwtBearer(options =>
     {
+        options.RequireHttpsMetadata = false;
+        options.Events = new JwtBearerEvents();
+        options.Events.OnTokenValidated = context =>
+        {
+            context.Response.StatusCode = 200;
+            return Task.CompletedTask;
+        };
+        options.Events.OnAuthenticationFailed = context =>
+        {
+            context.Response.StatusCode = 401;
+            return Task.CompletedTask;
+        };
+        options.Events.OnChallenge = context =>
+        {
+            context.Response.StatusCode = 401;
+            return Task.CompletedTask;
+        };
+        options.Events.OnMessageReceived = context =>
+        {
+            context.Response.StatusCode = 401;
+            return Task.CompletedTask;
+        };
+        
         options.SaveToken = true;
         var key = Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"]);
 

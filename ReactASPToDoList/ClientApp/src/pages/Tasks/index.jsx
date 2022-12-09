@@ -11,7 +11,7 @@ import {
     Nav,
   } from 'reactstrap';
 
-export const AuthLayout = () => {
+export const TaskLayout = () => {
     const [isOpen, setIsOpen] = useState(false);
     const toggle = () => setIsOpen(!isOpen);
 
@@ -25,6 +25,12 @@ export const AuthLayout = () => {
                     <NavItem>
                         <NavLink tag={Link} to="/">Domů</NavLink>
                     </NavItem>
+                    <NavItem>
+                        <NavLink tag={Link} to="/tasks">Úkoly</NavLink>
+                    </NavItem>
+                    <NavItem>
+                        <NavLink tag={Link} to="/tasks/add">Přidat</NavLink>
+                    </NavItem>
                 </Nav>
             </Collapse>
         </Navbar>
@@ -33,6 +39,6 @@ export const AuthLayout = () => {
         </Container>
         </>
     );
-}
+};
 
-export default AuthLayout;
+export default TaskLayout;

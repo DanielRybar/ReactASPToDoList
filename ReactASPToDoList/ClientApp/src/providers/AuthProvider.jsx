@@ -1,4 +1,7 @@
-import React, { createContext, useReducer, useContext } from "react";
+import React, { createContext, useReducer, useContext, useEffect } from "react";
+
+const SESSION_STORAGE_ID = "oauth2_token";
+let storedData = JSON.parse(sessionStorage.getItem(SESSION_STORAGE_ID));
 
 export const SET_ACCESS_TOKEN = "SET_ACCESS_TOKEN";
 export const CLEAR_ACCESS_TOKEN = "CLEAR_ACCESS_TOKEN";
@@ -29,12 +32,15 @@ const reducer = (state, action) => {
 export const AuthContext = createContext(initialState);
 export const AuthConsumer = AuthContext.Consumer;
 export const AuthProvider = props => {
-    const store = useReducer(
+    const [store, dispatch] = useReducer(
         reducer,
-        initialState
+        storedData || initialState
     );
+    useEffect(() => {
+        sessionStorage.setItem(SESSION_STORAGE_ID, JSON.stringify(store));
+    }, [store]);  
     return (
-        <AuthContext.Provider value={store}>
+        <AuthContext.Provider value={[store, dispatch]}>
             {props.children}
         </AuthContext.Provider>
     );

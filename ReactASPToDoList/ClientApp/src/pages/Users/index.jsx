@@ -1,4 +1,4 @@
-import {Outlet, Link} from "react-router-dom";
+import { Outlet, Link } from "react-router-dom"
 import {useState} from "react";
 import {
     Container,
@@ -11,7 +11,7 @@ import {
     Nav,
   } from 'reactstrap';
 
-export const AuthLayout = () => {
+export const UsersLayout = () => {
     const [isOpen, setIsOpen] = useState(false);
     const toggle = () => setIsOpen(!isOpen);
 
@@ -33,6 +33,6 @@ export const AuthLayout = () => {
         </Container>
         </>
     );
-}
+};
 
-export default AuthLayout;
+export default UsersLayout;

@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ReactASPToDoList.Data;
 using ReactASPToDoList.Models;
+using ReactASPToDoList.Models.InputModels;
 
 namespace ReactASPToDoList.Controllers
 {
@@ -100,37 +101,24 @@ namespace ReactASPToDoList.Controllers
             {
                 return BadRequest();
             }
-            if (_context.Users == null)
-            {
-                return Problem("Entity set 'AppDbContext.User'  is null.");
-            }
-            
-            User user = _context.Users.SingleOrDefault(b => b.UserId == id);
-            if (user != null)
-            {
-                patch.ApplyTo(user, ModelState);
 
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(ModelState);
-                }
+            var user = await _context.Users.FindAsync(id);
 
-                foreach (var op in patch.Operations)
-                {
-                    if (op.path.ToLower() == "/userid")
-                    {
-                        return BadRequest();
-                    }
-                }
-
-                _context.Entry(user).State = EntityState.Modified;
-                await _context.SaveChangesAsync();
-                return Ok(user);
-            }
-            else
+            if (user == null)
             {
                 return NotFound();
             }
+
+            patch.ApplyTo(user, ModelState);
+
+            if (!TryValidateModel(user))
+            {
+                return ValidationProblem(ModelState);
+            }
+
+            await _context.SaveChangesAsync();
+
+            return user;
         }
 
         // DELETE: api/Users/5
@@ -153,11 +141,5 @@ namespace ReactASPToDoList.Controllers
         {
             return _context.Users.Any(e => e.UserId == id);
         }
-    }
-
-    public class UserIM
-    {
-        public string UserName { get; set; } = String.Empty;
-        public string Password { get; set; } = String.Empty;
     }
 }

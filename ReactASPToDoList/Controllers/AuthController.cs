@@ -27,36 +27,40 @@ namespace ReactASPToDoList.Controllers
         
         [AllowAnonymous]
         [HttpPost("authenticate")]
-        public IActionResult Authenticate(string username, [DataType(DataType.Password)] string password)
+        public IActionResult Authenticate(UserIM entry)
         {
-            var token = _as.Authenticate(new Models.User { UserName = username, Password = HashFunctions.ComputeMD5Hash(password) });
-            var user = _context.Users.Where(x => x.UserName == username).FirstOrDefault();
+            if (entry == null) 
+                return BadRequest("No data provided");
+            var token = _as.Authenticate(new Models.User { UserName = entry.UserName, Password = HashFunctions.ComputeMD5Hash(entry.Password) });
+            var user = _context.Users.Where(x => x.UserName == entry.UserName).FirstOrDefault();
             if (user == null)
             {
-                _logger.LogError("Uživatel se jménem " + username + " neexistuje.");
+                _logger.LogError("Uživatel se jménem " + entry.UserName + " neexistuje.");
                 return NotFound();
             }
             else if (token == null && user != null)
             {
-                _logger.LogError("Špatné heslo " + password + " u uživatele " + username);
+                _logger.LogError("Špatné heslo " + entry.Password + " u uživatele " + entry.UserName);
                 return Unauthorized();
             }
             else if (token != null)
             {
-                _logger.LogInformation("Uživatel " + username + " se úspěšně přihlásil.");
+                _logger.LogInformation("Uživatel " + entry.UserName + " se úspěšně přihlásil.");
                 return Ok(token);
             }
             else
             {
-                _logger.LogError("Neznámá chyba při přihlašování uživatele " + username);
+                _logger.LogError("Neznámá chyba při přihlašování uživatele " + entry.UserName);
                 return BadRequest();
             }
         }
         
         [AllowAnonymous]
         [HttpPost("register")]
-        public async Task<IActionResult> Register(RegisterIM entry)
+        public async Task<IActionResult> Register(UserIM entry)
         {
+            if (entry == null)
+                return BadRequest("No data provided");
             entry.Password = HashFunctions.ComputeMD5Hash(entry.Password);
             var user = await _as.Register(entry);
             return Ok(user);

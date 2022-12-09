@@ -1,13 +1,11 @@
 import axios from "axios";
 import {useForm, Controller} from "react-hook-form";
-import {useAuthContext, SET_ACCESS_TOKEN} from "../../providers/AuthProvider"
 import {useNavigate} from "react-router-dom";
 import { useState } from "react";
 import { Form, FormGroup, Label, Button, Input, Spinner, Alert } from "reactstrap";
 
-export const Login = () => {
-    const {/*register, */handleSubmit, control, formState: {errors}} = useForm();
-    const [, dispatch] = useAuthContext();
+export const Register = () => {
+    const {/*register, */handleSubmit, control, watch, formState: {errors}} = useForm();
     const navigate = useNavigate();
     const [error, setError] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
@@ -16,19 +14,17 @@ export const Login = () => {
         setIsLoading(true);
         setError(null);
 
-        axios.post("/api/Auth/authenticate", 
+        axios.post("/api/Auth/register", 
         {
             username: data.username,
             password: data.password
         })
             .then((response) => {
-                dispatch({type: SET_ACCESS_TOKEN, payload: response.data.value})
-                //console.log(response.data.value);
-                navigate("/");
+                console.log(response.data);
+                navigate("/sign/in");
             })
             .catch((error) => {
-                //setError(error.response.status + " - " + error.response.statusText)
-                setError(errorCode(error.response.status));
+                setError(error.response.status + " - " + error.response.statusText)
                 console.error(error);
             })
             .finally(() => {
@@ -36,18 +32,9 @@ export const Login = () => {
             })
     }
 
-    const errorCode = (error) => { 
-        error = Number(error);
-        switch (error) {
-            case 401: return "Špatné heslo.";
-            case 404: return "Uživatel neexistuje.";
-            default: return "Nastala neznámá chyba.";
-        }
-    }
-
     return (
         <>
-            <h1>Login</h1>
+            <h1>Register</h1>
             <Form onSubmit={handleSubmit(onSubmit)}>
                 <FormGroup>
                     <Label>Jméno</Label>
@@ -60,16 +47,21 @@ export const Login = () => {
                     {errors.password?.type === 'required' && <p className='error'>Toto pole je povinné.</p>}
                 </FormGroup>
                 <FormGroup>
-                    <Button type="submit" color="primary">                        
-                        {isLoading ? <Spinner size="sm" color="light" /> : "Přihlásit se"}
+                    <Label>Heslo znovu</Label>
+                    <Controller name="passwordAgain" control={control} rules={{required: true, validate: (value) => value === watch("password")}} render={({ field }) => <Input type="password" {...field} />} />
+                    {errors.passwordAgain?.type === 'required' && <p className='error'>Toto pole je povinné.</p>}
+                    {errors.passwordAgain?.type === 'validate' && <p className='error'>Hesla se neshodují.</p>}
+                </FormGroup>
+                <FormGroup>
+                    <Button color="primary" type="submit" disabled={isLoading}>
+                        {isLoading ? <Spinner size="sm" color="light" /> : "Registrovat"}
                     </Button>
                 </FormGroup>
+                {error && <Alert color="danger">{error}</Alert>}
             </Form>
-            <div>
-                {error ? <Alert color="danger">{error}</Alert> : ""}
-            </div>
+
         </>
     );
-}
+};
 
-export default Login;
+export default Register;

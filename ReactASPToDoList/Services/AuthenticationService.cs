@@ -31,7 +31,7 @@ namespace ReactASPToDoList.Services
             return CreateAuthenticationToken(u);
         }
 
-        public async Task<User> Register(RegisterIM values)
+        public async Task<User> Register(UserIM values)
         {
             User user = new User
             {
