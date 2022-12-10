@@ -5,7 +5,7 @@ export const Home = () => {
     return(
         <>
         <h1>Token</h1>
-        <pre>{accessToken}</pre>
+        <pre>{accessToken ? accessToken : "Uživatel není přihlášen."}</pre>
         <h1>Profil</h1>
         <pre>{JSON.stringify(profile, " ", 4)}</pre>
         </>

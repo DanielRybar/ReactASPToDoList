@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ReactASPToDoList.Data;
+using ReactASPToDoList.Helpers;
 using ReactASPToDoList.Models;
 using ReactASPToDoList.Models.InputModels;
 
@@ -49,14 +50,23 @@ namespace ReactASPToDoList.Controllers
         // PUT: api/Users/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutUser(int id, User user)
+        public async Task<IActionResult> PutUser(int id, [FromBody] UserIdVM entry)
         {
-            if (id != user.UserId)
+            if (id != entry.Id)
             {
                 return BadRequest();
             }
 
+            var user = await _context.Users.FindAsync(id);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            
             _context.Entry(user).State = EntityState.Modified;
+
+            user.UserName = entry.UserName;
+            user.Password = HashFunctions.ComputeMD5Hash(entry.Password);
 
             try
             {

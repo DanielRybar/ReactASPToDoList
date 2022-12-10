@@ -47,7 +47,7 @@ export const Login = () => {
 
     return (
         <>
-            <h1>Login</h1>
+            <h1>Přihlášení uživatele</h1>
             <Form onSubmit={handleSubmit(onSubmit)}>
                 <FormGroup>
                     <Label>Jméno</Label>

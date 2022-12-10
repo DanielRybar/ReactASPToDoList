@@ -12,6 +12,7 @@ import UsersLayout from './pages/Users';
 import List from './pages/Users/List';
 import TaskLayout from './pages/Tasks';
 import AddTask from './pages/Tasks/AddTask';
+import { Container } from 'reactstrap';
 
 export default class App extends Component {
   static displayName = App.name;
@@ -33,7 +34,7 @@ export default class App extends Component {
             <Route index element={<Tasks />} />
             <Route path="/tasks/add" element={<AddTask/>} />
           </Route>
-          <Route path="*" element={<NotFound />} />
+          <Route path="*" element={<Container className='mt-5'><NotFound /></Container>} />
         </Routes>
     );
   }

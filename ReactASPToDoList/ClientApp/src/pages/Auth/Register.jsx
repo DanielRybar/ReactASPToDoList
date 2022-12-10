@@ -34,7 +34,7 @@ export const Register = () => {
 
     return (
         <>
-            <h1>Register</h1>
+            <h1>Registrace uživatele</h1>
             <Form onSubmit={handleSubmit(onSubmit)}>
                 <FormGroup>
                     <Label>Jméno</Label>
@@ -59,7 +59,6 @@ export const Register = () => {
                 </FormGroup>
                 {error && <Alert color="danger">{error}</Alert>}
             </Form>
-
         </>
     );
 };

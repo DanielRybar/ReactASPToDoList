@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ReactASPToDoList.Data;
 using ReactASPToDoList.Models;
+using ReactASPToDoList.Models.InputModels;
 using Task = ReactASPToDoList.Models.Task;
 
 namespace ReactASPToDoList.Controllers
@@ -49,14 +50,26 @@ namespace ReactASPToDoList.Controllers
         // PUT: api/Tasks/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutTask(int id, Task task)
+        public async Task<IActionResult> PutTask(int id, [FromBody] TaskIdVM entry)
         {
-            if (id != task.TaskId)
+            if (id != entry.Id)
             {
                 return BadRequest();
             }
 
-            _context.Entry(task).State = EntityState.Modified;
+            var item = await _context.Tasks.FindAsync(id);
+            if (item == null)
+            {
+                return NotFound();
+            }
+            
+            _context.Entry(item).State = EntityState.Modified;
+
+            item.Name = entry.Name;
+            item.Description = entry.Description;
+            item.Time = entry.Time;
+            item.UserId = entry.UserId;
+            item.Finished = entry.Finished;
 
             try
             {
@@ -133,14 +146,5 @@ namespace ReactASPToDoList.Controllers
         {
             return _context.Tasks.Any(e => e.TaskId == id);
         }
-    }
-
-    public class TaskIM
-    {
-        public string Name { get; set; } = String.Empty;
-        public string Description { get; set; } = String.Empty;
-        public int UserId { get; set; }
-        public DateTime Time { get; set; }
-        public bool Finished { get; set; } = false;
     }
 }

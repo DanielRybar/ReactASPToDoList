@@ -36,12 +36,12 @@ namespace ReactASPToDoList.Controllers
             if (user == null)
             {
                 _logger.LogError("Uživatel se jménem " + entry.UserName + " neexistuje.");
-                return NotFound();
+                return NotFound("Uživatel se jménem " + entry.UserName + " neexistuje.");
             }
             else if (token == null && user != null)
             {
                 _logger.LogError("Špatné heslo " + entry.Password + " u uživatele " + entry.UserName);
-                return Unauthorized();
+                return Unauthorized("Špatné heslo " + entry.Password + " u uživatele " + entry.UserName);
             }
             else if (token != null)
             {
@@ -51,7 +51,7 @@ namespace ReactASPToDoList.Controllers
             else
             {
                 _logger.LogError("Neznámá chyba při přihlašování uživatele " + entry.UserName);
-                return BadRequest();
+                return BadRequest("Neznámá chyba při přihlašování uživatele " + entry.UserName);
             }
         }
         
