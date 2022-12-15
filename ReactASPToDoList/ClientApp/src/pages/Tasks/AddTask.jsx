@@ -16,7 +16,7 @@ export const AddTask = () => {
     const onSubmit = (data) => {
         setIsLoading(true);
         setError(null);
-        
+
         let obj = {
             name: data.name,
             description: data.description ? data.description : "",

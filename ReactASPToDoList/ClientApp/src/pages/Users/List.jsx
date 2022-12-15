@@ -3,7 +3,6 @@ import { useCallback, useEffect, useState } from "react";
 import { useAuthContext } from "../../providers/AuthProvider";
 import {
     Input,
-    Form,
     FormGroup,
     Label,
     Spinner,
@@ -15,13 +14,14 @@ import {
     ModalBody,
     ModalFooter
 } from "reactstrap";
-import { useForm, Controller, useFieldArray } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 
 export const List = () => {
     const [data, setData] = useState(null);
     const [error, setError] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
-    const [{ accessToken }] = useAuthContext();
+    const [{ accessToken, userId }] = useAuthContext();
+    const [deleteError, setDeleteError] = useState(null);
 
     const [id, setId] = useState(null);
     const [modal, setModal] = useState(false);
@@ -74,6 +74,23 @@ export const List = () => {
             })
     }, [accessToken]);
 
+    const handleDelete = useCallback((id) => {
+        if (Number(userId) === Number(id)) {
+            setDeleteError("Nelze smazat přihlášeného uživatele.");
+            console.log(userId, id);
+        } else {
+            axios.delete("/api/Users/" + id, {
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: "Bearer " + accessToken
+                }
+            })
+            .then((response) => { setDeleteError(null); })
+            .catch((error) => { console.error(error); })
+            .finally(() => getUsers())
+        }
+    }, [accessToken, getUsers, userId]);
+
     useEffect(() => {
         getUsers();
     }, [getUsers]);
@@ -117,6 +134,8 @@ export const List = () => {
                 </Modal>
 
                 <h1>Uživatelé</h1>
+                <p>Pozn: Žlutě vyznačený uživatel je aktuálně přihlášený uživatel.</p>
+                {deleteError ? <Alert color="dark">Nelze smazat přihlášeného uživatele!</Alert> : null}
                 <Table>
                     <thead>
                         <tr>
@@ -128,7 +147,7 @@ export const List = () => {
                     </thead>
                     <tbody>
                         {data.map((user) => (
-                            <tr key={user.userId}>
+                            <tr key={user.userId} style={{backgroundColor: (Number(userId) === Number(user.userId)) ? "yellow": ""}}>
                                 <td>{user.userId}</td>
                                 <td>{user.userName}</td>
                                 <td>{user.password}</td>
@@ -139,7 +158,8 @@ export const List = () => {
                                     setValue("passwordAgain", "");
                                     setModalError(null);
                                     openModal();
-                                    }}>Změnit údaje</Button></td>
+                                    }}>Změnit údaje</Button>
+                                <Button size="sm" color="danger" onClick={e => {handleDelete(user.userId)}}>Smazat uživatele</Button></td>
                             </tr>
                         ))}
                     </tbody>
